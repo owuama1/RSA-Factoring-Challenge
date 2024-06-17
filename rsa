@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+import sys
+import math
+from sympy import isprime
+
+def factorize_rsa(n):
+    """Factorizes the RSA number n into two prime factors"""
+    # Check for small factors first
+    if n % 2 == 0:
+        print(f"{n}=2*{n//2}")
+        return
+    
+    # Start from the smallest odd factor and go up to the square root of n
+    sqrt_n = int(math.isqrt(n)) + 1
+    for i in range(3, sqrt_n, 2):
+        if n % i == 0:
+            p, q = i, n // i
+            if isprime(p) and isprime(q):
+                print(f"{n}={p}*{q}")
+                return
+    
+    # If no factors found, n is prime itself (shouldn't happen in RSA context)
+    print(f"{n}={n}*1")
+
+def main(file_path):
+    """Read the file and factorize the number"""
+    with open(file_path, 'r') as file:
+        number = int(file.readline().strip())
+        factorize_rsa(number)
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: ./rsa <file>")
+        sys.exit(1)
+    
+    main(sys.argv[1])
+
