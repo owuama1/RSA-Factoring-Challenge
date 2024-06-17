@@ -1,37 +1,46 @@
-#!/usr/bin/env python3
-import sys
+#!/usr/bin/python3
+from sys import argv
 import math
-from sympy import isprime
+"""gets the first two factors of any number"""
 
-def factorize_rsa(n):
-    """Factorizes the RSA number n into two prime factors"""
-    # Check for small factors first
-    if n % 2 == 0:
-        print(f"{n}=2*{n//2}")
-        return
-    
-    # Start from the smallest odd factor and go up to the square root of n
-    sqrt_n = int(math.isqrt(n)) + 1
-    for i in range(3, sqrt_n, 2):
-        if n % i == 0:
-            p, q = i, n // i
-            if isprime(p) and isprime(q):
-                print(f"{n}={p}*{q}")
-                return
-    
-    # If no factors found, n is prime itself (shouldn't happen in RSA context)
-    print(f"{n}={n}*1")
 
-def main(file_path):
-    """Read the file and factorize the number"""
-    with open(file_path, 'r') as file:
-        number = int(file.readline().strip())
-        factorize_rsa(number)
+def is_prime(num):
+    """checks if a number is prime"""
+    i = 3
+    if num % 2 == 0:
+        return False
+    while i * i <= num:
+        if num % i == 0:
+            return False
+        i += 2
+    return True
+
+
+def factory(num):
+    """This factor function gets the factors of a number & prints them out"""
+    if num % 2 == 0:
+        i = 2
+        print("{}={}*{}".format(num, int(num/i), i))
+    else:
+        sq = math.sqrt(num)
+        if sq % 1 == 0:
+            print("{}={}*{}".format(num, sq, int(num/sq)))
+            return
+        sq = int(sq) + 1
+        for i in range(3, sq, +2):
+            if num % i == 0:
+                if is_prime(i):
+                    print("{}={}*{}".format(num, int(num/i), i))
+                    return
+
+
+def factors(filename):
+    """read_file"""
+    with open(filename, encoding="utf-8") as my_file:
+        for i in my_file.readlines():
+            n = int(i)
+            result = factory(n)
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: ./rsa <file>")
-        sys.exit(1)
-    
-    main(sys.argv[1])
-
+    factors(argv[1])
