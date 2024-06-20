@@ -1,45 +1,48 @@
-#!/usr/bin/python3
-import sys
-import math
+#!/usr/bin/env bash
+#is a challenge
+check_factor()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                count=0
+                num2=1
+                for a in ${args[*]};
+                do
+                        if [ $count -gt 1 ];
+                        then
+                                num2=$(echo $a*$num2 | bc)
+                        fi
+                        count=$((count + 1))
+                done
+        else
+                num2=$3
+        fi
 
-def is_prime(num):
-    """Checks if a number is prime"""
-    if num <= 1:
-        return False
-    if num <= 3:
-        return True
-    if num % 2 == 0 or num % 3 == 0:
-        return False
-    i = 5
-    while i * i <= num:
-        if num % i == 0 or num % (i + 2) == 0:
-            return False
-        i += 6
-    return True
+        num1=$2
+        num=$(echo "$1" | tr ':' '=')
 
-def factory(num):
-    """Gets the prime factors of a number & prints them out"""
-    if num % 2 == 0 and is_prime(num // 2):
-        print(f"{num}={num // 2}*2")
-        return
-    limit = int(math.sqrt(num)) + 1
-    for i in range(3, limit, 2):
-        if num % i == 0:
-            factor1, factor2 = i, num // i
-            if is_prime(factor1) and is_prime(factor2):
-                print(f"{num}={factor2}*{factor1}")
-                return
-    # If no factors are found, num is prime (RSA numbers won't be prime)
-    print(f"{num}={num}*1")
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+	        if ((result == 1)); then
+		        numcp=$num1
+		        num1=$num2
+		        num2=$numcp
+                fi
 
-def factors(filename):
-    """Read file and factorize the number"""
-    with open(filename, encoding="utf-8") as my_file:
-        number = int(my_file.readline().strip())
-        factory(number)
+        echo "$num$num1*$num2"
+}
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: ./rsa <file>")
-        sys.exit(1)
-    factors(sys.argv[1])
+if [ $# -ne 1 ]
+then
+        echo 'Usage: rsa <file>'
+        exit 1
+else
+
+        while read i
+        do
+
+                result=$(factor "$i")
+                check_factor $result
+
+        done < "$1"
+fi
